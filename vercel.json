@@ -8,5 +8,10 @@
     "env": {
       "NODE_ENV": "production"
     }
+  },
+  "functions": {
+    "api/generate.js": {
+      "runtime": "nodejs18.x"
+    }
   }
 }
