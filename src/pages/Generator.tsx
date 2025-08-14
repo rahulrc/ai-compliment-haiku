@@ -250,7 +250,7 @@ export default function Generator() {
                   value={inputs.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
+                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
                   disabled={preferences.privacyNoName}
                 />
                 {preferences.privacyNoName && (
@@ -267,7 +267,7 @@ export default function Generator() {
                 <select
                   value={inputs.relationship}
                   onChange={(e) => handleInputChange('relationship', e.target.value)}
-                  className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
+                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
                 >
                   {relationships.map((rel) => (
                     <option key={rel} value={rel}>

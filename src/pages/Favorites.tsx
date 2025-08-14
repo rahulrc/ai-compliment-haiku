@@ -19,7 +19,19 @@ export default function Favorites() {
     if (!preferences.soundOn) return
     
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      // Create audio context if it doesn't exist
+      let audioContext = (window as any).audioContext
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        ;(window as any).audioContext = audioContext
+      }
+      
+      // Resume context if suspended (required by modern browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+      
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       
@@ -43,7 +55,19 @@ export default function Favorites() {
     if (!preferences.soundOn) return
     
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)
+      // Create audio context if it doesn't exist
+      let audioContext = (window as any).audioContext
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        ;(window as any).audioContext = audioContext
+      }
+      
+      // Resume context if suspended (required by modern browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+      
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       

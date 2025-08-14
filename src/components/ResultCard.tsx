@@ -24,7 +24,12 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
     
     try {
       // Create audio context if it doesn't exist
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      let audioContext = (window as any).audioContext
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        ;(window as any).audioContext = audioContext
+      }
       
       // Resume context if suspended (required by modern browsers)
       if (audioContext.state === 'suspended') {
@@ -56,7 +61,12 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
     
     try {
       // Create audio context if it doesn't exist
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      let audioContext = (window as any).audioContext
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        ;(window as any).audioContext = audioContext
+      }
       
       // Resume context if suspended (required by modern browsers)
       if (audioContext.state === 'suspended') {
@@ -265,6 +275,19 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
               <span className="text-sm sm:text-base">Another</span>
             </div>
           </button>
+
+          {/* Sound Test Button - Remove this after debugging */}
+          {preferences.soundOn && (
+            <button
+              onClick={() => {
+                playPop()
+                setTimeout(() => playSparkle(), 200)
+              }}
+              className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-xs font-medium transition-colors duration-200"
+            >
+              🔊 Test Sound
+            </button>
+          )}
         </div>
 
         {/* Keyboard Shortcuts */}
