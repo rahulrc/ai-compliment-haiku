@@ -10,7 +10,8 @@ import Favorites from './pages/Favorites'
 import History from './pages/History'
 import Settings from './pages/Settings'
 
-// Mobile-optimized app with responsive design
+// Mobile-optimized app with responsive design - v1.1.0
+// Force rebuild for mobile improvements deployment
 export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
