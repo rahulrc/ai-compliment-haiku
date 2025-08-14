@@ -40,7 +40,9 @@ Styles:
 - Poetic: Elegant, artistic, metaphorical
 - Professional: Polished, formal, workplace-appropriate
 
-Always return valid JSON with exactly this format:
+IMPORTANT: Return ONLY raw JSON without any markdown formatting, code blocks, or extra text.
+
+Return exactly this format:
 {
   "compliment": "Your haiku text here\\nwith proper line breaks",
   "sparkleScore": 3,
@@ -69,7 +71,9 @@ Specificity levels:
 - 4: Heavily contextual, very personalized
 - 5: Highly tailored to the specific context provided
 
-Always return valid JSON with exactly this format:
+IMPORTANT: Return ONLY raw JSON without any markdown formatting, code blocks, or extra text.
+
+Return exactly this format:
 {
   "compliment": "Your actual compliment text here",
   "sparkleScore": 3,
@@ -130,7 +134,17 @@ Please ensure the compliment matches the style and specificity level requested.`
     // Parse the JSON response
     let parsedContent
     try {
-      parsedContent = JSON.parse(content)
+      // Clean the response - remove markdown code blocks if present
+      let cleanContent = content.trim()
+      
+      // Remove markdown code block formatting (```json ... ```)
+      if (cleanContent.startsWith('```json')) {
+        cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/\s*```$/, '')
+      } else if (cleanContent.startsWith('```')) {
+        cleanContent = cleanContent.replace(/^```\s*/, '').replace(/\s*```$/, '')
+      }
+      
+      parsedContent = JSON.parse(cleanContent)
     } catch (parseError) {
       // If parsing fails, create a fallback response
       parsedContent = {
