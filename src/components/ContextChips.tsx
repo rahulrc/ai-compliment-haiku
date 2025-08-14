@@ -21,38 +21,38 @@ export default function ContextChips({ context, onAdd, onRemove, maxCount }: Con
   }
 
   return (
-    <div className="space-y-3">
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
+    <div className="space-y-4">
+      {/* Input Form */}
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Add context hint..."
-          className="bubble-input flex-1 text-sm sm:text-base"
+          className="bubble-input flex-1 text-sm"
           disabled={context.length >= maxCount}
         />
         <button
           type="submit"
           disabled={!inputValue.trim() || context.length >= maxCount}
-          className="bubble-button px-3 sm:px-4 py-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bubble-button px-6 py-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
           Add
         </button>
       </form>
 
-      {/* Chips */}
+      {/* Chips Display */}
       {context.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {context.map((item, index) => (
             <div
               key={index}
-              className="flex items-center space-x-2 px-3 py-1.5 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full text-sm"
+              className="flex items-center space-x-2 px-3 py-2 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full text-sm"
             >
-              <span>{item}</span>
+              <span className="max-w-[120px] truncate">{item}</span>
               <button
                 onClick={() => onRemove(index)}
-                className="text-primary-500 hover:text-primary-700 dark:hover:text-primary-200 transition-colors duration-200"
+                className="text-primary-500 hover:text-primary-700 dark:hover:text-primary-200 transition-colors duration-200 flex-shrink-0"
                 aria-label={`Remove ${item}`}
               >
                 ×
