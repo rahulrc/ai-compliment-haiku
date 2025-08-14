@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
-import { Volume2, VolumeX, Sun, Moon, Sparkles } from 'lucide-react'
+import { Volume2, VolumeX, Sun, Moon, Sparkles, Menu, X } from 'lucide-react'
 import { usePreferences } from '../contexts/PreferencesContext'
+import { useState } from 'react'
 
 interface HeaderProps {
   theme: 'light' | 'dark'
@@ -9,6 +10,7 @@ interface HeaderProps {
 
 export default function Header({ theme, onThemeToggle }: HeaderProps) {
   const { preferences, toggleSound } = usePreferences()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const navItems = [
     { path: '/', label: 'Generator' },
@@ -16,6 +18,10 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
     { path: '/history', label: 'History' },
     { path: '/settings', label: 'Settings' },
   ]
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
 
   return (
     <header className="bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50">
@@ -31,7 +37,7 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
                 Haikudos
               </h1>
               <p className="text-xs text-surface-500 dark:text-surface-400">
-                AI-powered kindness & poetry
+                Poetry and Praise, On Demand
               </p>
             </div>
             <div className="sm:hidden">
@@ -41,7 +47,7 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
             </div>
           </div>
 
-          {/* Navigation - Hidden on mobile */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <NavLink
@@ -60,56 +66,70 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
             ))}
           </nav>
 
-          {/* Global Controls */}
-          <div className="flex items-center space-x-2">
-            {/* Sound Toggle */}
-            <button
-              onClick={toggleSound}
-              className="p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
-              aria-label={preferences.soundOn ? 'Mute sounds' : 'Unmute sounds'}
-            >
-              {preferences.soundOn ? (
-                <Volume2 className="w-5 h-5" />
-              ) : (
-                <VolumeX className="w-5 h-5" />
-              )}
-            </button>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
 
-            {/* Theme Toggle */}
-            <button
-              onClick={onThemeToggle}
-              className="p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700 transition-colors duration-200"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-            >
-              {theme === 'light' ? (
-                <Moon className="w-5 h-5" />
-              ) : (
-                <Sun className="w-5 h-5" />
-              )}
-            </button>
+        {/* Mobile Navigation Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden pb-4 border-t border-surface-200 dark:border-surface-700">
+            <nav className="flex flex-col space-y-2 pt-4">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                        : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))}
+              
+              {/* Sound and Theme Controls in Mobile Menu */}
+              <div className="border-t border-surface-200 dark:border-surface-700 pt-4 mt-2">
+                <button
+                  onClick={toggleSound}
+                  className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700"
+                >
+                  <div className="flex items-center space-x-3">
+                    {preferences.soundOn ? (
+                      <Volume2 className="w-4 h-4" />
+                    ) : (
+                      <VolumeX className="w-4 h-4" />
+                    )}
+                    <span>{preferences.soundOn ? 'Sound On' : 'Sound Off'}</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={onThemeToggle}
+                  className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700"
+                >
+                  <div className="flex items-center space-x-3">
+                    {theme === 'light' ? (
+                      <Moon className="w-4 h-4" />
+                    ) : (
+                      <Sun className="w-4 h-4" />
+                    )}
+                    <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+                  </div>
+                </button>
+              </div>
+            </nav>
           </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <div className="md:hidden pb-4">
-          <nav className="flex space-x-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex-1 text-center px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-                      : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-100 dark:hover:bg-surface-700'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
+        )}
       </div>
     </header>
   )
