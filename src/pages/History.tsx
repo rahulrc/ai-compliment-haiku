@@ -80,143 +80,146 @@ export default function History() {
     return new Date(timestamp).toLocaleDateString()
   }
 
-  if (history.length === 0) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center py-16"
-        >
-          <Clock className="w-24 h-24 mx-auto mb-6 text-surface-300 dark:text-surface-600" />
-          <h2 className="text-2xl font-display font-semibold mb-4">
-            No history yet
-          </h2>
-          <p className="text-surface-600 dark:text-surface-400 mb-8">
-            Generate your first compliment to see it here
-          </p>
-          <a
-            href="/"
-            className="inline-flex items-center space-x-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-colors duration-200"
-          >
-            <span>Generate Compliment</span>
-          </a>
-        </motion.div>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        transition={{ duration: 0.5 }}
+        className="space-y-6 sm:space-y-8"
       >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-center sm:text-left">
-            <h1 className="text-3xl font-display font-bold mb-2">
-              Recent Compliments
-            </h1>
-            <p className="text-surface-600 dark:text-surface-400">
-              Last {history.length} generated
-            </p>
-          </div>
+        <div className="text-center">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-surface-900 dark:text-surface-100 mb-2">
+            Generation History
+          </h1>
+          <p className="text-surface-600 dark:text-surface-400 text-sm sm:text-base">
+            Your recent compliments and haikus
+          </p>
+        </div>
 
-          <button
-            onClick={() => setShowClearConfirm(true)}
-            className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Clear History</span>
-          </button>
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-surface-600 dark:text-surface-400">
+            {history.length} recent generation{history.length !== 1 ? 's' : ''}
+          </p>
+          
+          {history.length > 0 && (
+            <button
+              onClick={() => setShowClearConfirm(true)}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              Clear History
+            </button>
+          )}
         </div>
 
         {/* History List */}
-        <div className="space-y-4">
-          <AnimatePresence>
+        {history.length === 0 ? (
+          <div className="bubble-card p-8 text-center">
+            <div className="text-6xl mb-4">📝</div>
+            <h3 className="text-xl font-semibold text-surface-900 dark:text-surface-100 mb-2">
+              No history yet
+            </h3>
+            <p className="text-surface-600 dark:text-surface-400 mb-6">
+              Generate some compliments or haikus to see them here!
+            </p>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="bubble-button"
+            >
+              Start Generating
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-6">
             {history.map((compliment, index) => (
               <motion.div
                 key={compliment.id}
-                layout
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2, delay: index * 0.05 }}
-                className="bubble-card p-6"
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className="bubble-card p-4 sm:p-6"
               >
-                <div className="flex flex-col sm:flex-row gap-4">
-                  {/* Main Content */}
-                  <div className="flex-1">
-                    {/* Style and Time */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="chip text-xs">
-                        {compliment.style}
-                      </span>
-                      <span className="text-sm text-surface-500 dark:text-surface-400">
-                        {formatTimestamp(compliment.timestamp)}
-                      </span>
+                {/* Content */}
+                <div className="mb-4">
+                  {compliment.tags.includes('haiku') ? (
+                    <div className="text-lg sm:text-xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
+                      {compliment.text.split('\n').map((line, index) => (
+                        <div key={index} className="mb-1 last:mb-0">
+                          {line}
+                        </div>
+                      ))}
                     </div>
-
-                    {/* Compliment Text */}
-                    <blockquote className="text-lg font-medium text-surface-900 dark:text-surface-100 leading-relaxed text-balance mb-3">
+                  ) : (
+                    <blockquote className="text-lg sm:text-xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
                       "{compliment.text}"
                     </blockquote>
+                  )}
+                </div>
 
-                    {/* Tags */}
-                    {compliment.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {compliment.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="chip text-xs px-2 py-1"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Context */}
-                    {compliment.context && compliment.context.length > 0 && (
-                      <div className="text-sm text-surface-600 dark:text-surface-400">
-                        <span className="font-medium">Context:</span>{' '}
-                        {compliment.context.join(', ')}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-center sm:flex-col gap-2">
-                    <button
-                      onClick={() => handleFavorite(compliment)}
-                      className={`p-3 rounded-lg transition-colors duration-200 ${
-                        compliment.isFavorite
-                          ? 'text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
-                          : 'text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700'
-                      }`}
-                      aria-label={compliment.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                {/* Tags and Sparkle */}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {compliment.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 text-xs rounded-full"
                     >
-                      <Star className={`w-5 h-5 ${compliment.isFavorite ? 'fill-current' : ''}`} />
-                    </button>
+                      {tag}
+                    </span>
+                  ))}
+                  <div className="flex items-center space-x-1 ml-auto">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-3 h-3 rounded-full ${
+                          i < compliment.sparkleScore 
+                            ? 'bg-yellow-400' 
+                            : 'bg-surface-200 dark:bg-surface-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
 
+                {/* Actions and Date */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={() => handleCopy(compliment)}
-                      className="p-3 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors duration-200"
-                      aria-label="Copy compliment"
+                      className="flex items-center justify-center space-x-2 px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
                     >
-                      <Copy className="w-5 h-5" />
+                      <span>📋</span>
+                      <span>Copy</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleFavorite(compliment)}
+                      className={`flex items-center justify-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                        compliment.isFavorite 
+                          ? 'bg-yellow-500 hover:bg-yellow-600 text-white' 
+                          : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300'
+                      }`}
+                    >
+                      <span className="text-lg">
+                        {compliment.isFavorite ? '★' : '☆'}
+                      </span>
+                      <span>{compliment.isFavorite ? 'Favorited' : 'Favorite'}</span>
                     </button>
                   </div>
+                  
+                  <p className="text-xs text-surface-500 dark:text-surface-400">
+                    {new Date(compliment.timestamp).toLocaleDateString()}
+                  </p>
                 </div>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        )}
       </motion.div>
 
-      {/* Clear History Confirmation Modal */}
+      {/* Clear Confirmation Modal */}
       <AnimatePresence>
         {showClearConfirm && (
           <motion.div
@@ -224,42 +227,32 @@ export default function History() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-            onClick={() => setShowClearConfirm(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bubble-card p-6 max-w-md w-full"
-              onClick={(e) => e.stopPropagation()}
+              className="bubble-card p-6 max-w-sm w-full"
             >
-              <div className="text-center space-y-4">
-                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
-                  <AlertTriangle className="w-8 h-8 text-red-500" />
-                </div>
-                
-                <h3 className="text-xl font-semibold text-surface-900 dark:text-surface-100">
-                  Clear History?
-                </h3>
-                
-                <p className="text-surface-600 dark:text-surface-400">
-                  This will permanently remove all {history.length} compliments from your history. This action cannot be undone.
-                </p>
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowClearConfirm(false)}
-                    className="flex-1 px-4 py-2 text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors duration-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleClearHistory}
-                    className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200"
-                  >
-                    Clear All
-                  </button>
-                </div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
+                Clear History?
+              </h3>
+              <p className="text-surface-600 dark:text-surface-400 mb-6">
+                This will permanently remove all your generation history. This action cannot be undone.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleClearHistory}
+                  className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-200"
+                >
+                  Yes, Clear All
+                </button>
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="flex-1 px-4 py-2 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Cancel
+                </button>
               </div>
             </motion.div>
           </motion.div>

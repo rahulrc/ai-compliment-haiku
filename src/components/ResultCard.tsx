@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Copy, RefreshCw, Sparkles, Shield } from 'lucide-react'
 import { useCompliments } from '../contexts/ComplimentsContext'
@@ -144,8 +144,9 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bubble-card p-8"
-        aria-live="polite"
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className="bubble-card p-4 sm:p-6 lg:p-8"
       >
         {/* Safety Shield */}
         {compliment.tags.includes('safety-coerced') && (
@@ -157,11 +158,32 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
           </div>
         )}
 
-        {/* Compliment/Haiku Text */}
-        <div className="text-center mb-6">
+        {/* Sparkle Meter */}
+        <div className="flex items-center justify-center mb-4 sm:mb-6">
+          <div className="flex items-center space-x-2">
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ scale: 0 }}
+                animate={{ scale: i < compliment.sparkleScore ? 1 : 0.3 }}
+                transition={{ delay: i * 0.1 }}
+                className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full ${
+                  i < compliment.sparkleScore 
+                    ? 'bg-yellow-400 animate-pulse' 
+                    : 'bg-surface-200 dark:bg-surface-600'
+                }`}
+              />
+            ))}
+          </div>
+          <span className="ml-3 text-sm sm:text-base text-surface-600 dark:text-surface-400">
+            Sparkle Level {compliment.sparkleScore}/5
+          </span>
+        </div>
+
+        {/* Compliment Text */}
+        <div className="text-center mb-6 sm:mb-8">
           {compliment.tags.includes('haiku') ? (
-            // Render haiku with proper line breaks
-            <div className="text-2xl md:text-3xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
+            <div className="text-xl sm:text-2xl md:text-3xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
               {compliment.text.split('\n').map((line, index) => (
                 <div key={index} className="mb-2 last:mb-0">
                   {line}
@@ -169,72 +191,64 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
               ))}
             </div>
           ) : (
-            // Render regular compliment
-            <blockquote className="text-2xl md:text-3xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed text-balance">
+            <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed text-balance">
               "{compliment.text}"
             </blockquote>
           )}
         </div>
 
         {/* Tags */}
-        {compliment.tags.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
-            {compliment.tags.map((tag) => (
-              <span
-                key={tag}
-                className="chip text-xs px-3 py-1"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Sparkle Meter */}
-        <div className="flex justify-center items-center mb-6">
-          <div className="flex items-center space-x-1">
-            {renderSparkles(compliment.sparkleScore)}
-          </div>
-          <span className="ml-3 text-sm text-surface-600 dark:text-surface-400">
-            Sparkle level {compliment.sparkleScore}/5
-          </span>
+        <div className="flex flex-wrap justify-center gap-2 mb-6 sm:mb-8">
+          {compliment.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2 py-1 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 text-xs rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={handleFavorite}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-              compliment.isFavorite
-                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300'
-            }`}
-            aria-label={compliment.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            className={`bubble-button ${
+              compliment.isFavorite 
+                ? 'bg-yellow-500 hover:bg-yellow-600' 
+                : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600'
+            } text-surface-700 dark:text-surface-300 px-4 sm:px-6 py-2 sm:py-3 w-full sm:w-auto`}
           >
-            <Star className={`w-5 h-5 ${compliment.isFavorite ? 'fill-current' : ''}`} />
-            <span>{compliment.isFavorite ? 'Favorited' : 'Favorite'}</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg sm:text-xl">
+                {compliment.isFavorite ? '★' : '☆'}
+              </span>
+              <span className="text-sm sm:text-base">
+                {compliment.isFavorite ? 'Favorited' : 'Favorite'}
+              </span>
+            </div>
           </button>
 
           <button
             onClick={handleCopy}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
-              copied
-                ? 'bg-green-500 hover:bg-green-600 text-white'
-                : 'bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300'
-            }`}
-            aria-label="Copy compliment"
+            className="bubble-button bg-primary-500 hover:bg-primary-600 text-white px-4 sm:px-6 py-2 sm:py-3 w-full sm:w-auto"
           >
-            <Copy className="w-5 h-5" />
-            <span>{copied ? 'Copied!' : 'Copy'}</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg sm:text-xl">📋</span>
+              <span className="text-sm sm:text-base">
+                {copied ? 'Copied!' : 'Copy'}
+              </span>
+            </div>
           </button>
 
           <button
             onClick={handleGenerateAnother}
-            className="flex items-center space-x-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium transition-all duration-200"
-            aria-label="Generate another compliment"
+            className="bubble-button bg-green-500 hover:bg-green-600 text-white px-4 sm:px-6 py-2 sm:py-3 w-full sm:w-auto"
           >
-            <RefreshCw className="w-5 h-5" />
-            <span>Another</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-lg sm:text-xl">🔄</span>
+              <span className="text-sm sm:text-base">Another</span>
+            </div>
           </button>
         </div>
 

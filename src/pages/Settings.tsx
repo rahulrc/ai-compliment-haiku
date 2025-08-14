@@ -15,207 +15,162 @@ export default function Settings() {
 
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
+        transition={{ duration: 0.5 }}
+        className="space-y-6 sm:space-y-8"
       >
         {/* Header */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <SettingsIcon className="w-10 h-10 text-primary-600 dark:text-primary-400" />
-          </div>
-          <h1 className="text-3xl font-display font-bold mb-2">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-surface-900 dark:text-surface-100 mb-2">
             Settings
           </h1>
-          <p className="text-surface-600 dark:text-surface-400">
+          <p className="text-surface-600 dark:text-surface-400 text-sm sm:text-base">
             Customize your compliment and haiku experience
           </p>
         </div>
 
-        {/* Settings Sections */}
-        <div className="space-y-8">
+        {/* Settings Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Defaults Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bubble-card p-6"
-          >
-            <div className="flex items-center space-x-3 mb-6">
-              <Sliders className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-xl font-semibold">Default Settings</h2>
+          <div className="bubble-card p-4 sm:p-6">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900 rounded-lg">
+                <Palette className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-100">
+                Defaults
+              </h2>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Default Style */}
+            
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                   Default Style
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={preferences.defaultStyle}
+                  onChange={(e) => updatePreferences({ defaultStyle: e.target.value as any })}
+                  className="bubble-input w-full"
+                >
                   {styles.map((style) => (
-                    <button
-                      key={style.value}
-                      onClick={() => updatePreferences({ defaultStyle: style.value })}
-                      className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                        preferences.defaultStyle === style.value
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                          : 'border-surface-200 dark:border-surface-600 hover:border-surface-300 dark:hover:border-surface-500'
-                      }`}
-                    >
-                      <div className={`font-medium text-sm ${
-                        preferences.defaultStyle === style.value
-                          ? 'text-primary-700 dark:text-primary-300'
-                          : 'text-surface-700 dark:text-surface-300'
-                      }`}>
-                        {style.label}
-                      </div>
-                      <div className={`text-xs ${
-                        preferences.defaultStyle === style.value
-                          ? 'text-primary-600 dark:text-primary-400'
-                          : 'text-surface-500 dark:text-surface-400'
-                      }`}>
-                        {style.description}
-                      </div>
-                    </button>
+                    <option key={style} value={style}>
+                      {style.charAt(0).toUpperCase() + style.slice(1)}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
-
-              {/* Default Specificity */}
+              
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                   Default Specificity
                 </label>
-                <div className="space-y-2">
-                  {[1, 2, 3, 4, 5].map((value) => (
-                    <button
-                      key={value}
-                      onClick={() => updatePreferences({ defaultSpecificity: value })}
-                      className={`w-full p-3 rounded-lg border-2 transition-all duration-200 ${
-                        preferences.defaultSpecificity === value
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                          : 'border-surface-200 dark:border-surface-600 hover:border-surface-300 dark:hover:border-surface-500 text-surface-700 dark:text-surface-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">Level {value}</span>
-                        <span className="text-sm opacity-70">
-                          {value === 1 && 'General'}
-                          {value === 2 && 'Light'}
-                          {value === 3 && 'Balanced'}
-                          {value === 4 && 'Specific'}
-                          {value === 5 && 'Precise'}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={preferences.defaultSpecificity}
+                  onChange={(e) => updatePreferences({ defaultSpecificity: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-surface-200 dark:bg-surface-600 rounded-lg appearance-none cursor-pointer slider"
+                />
+                <div className="flex justify-between text-xs text-surface-500 dark:text-surface-400 mt-1">
+                  <span>General</span>
+                  <span>Specific</span>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Audio & Motion Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bubble-card p-6"
-          >
-            <div className="flex items-center space-x-3 mb-6">
-              <Volume2 className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-xl font-semibold">Audio & Motion</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Sound Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
-                  Sound Effects
-                </label>
-                <button
-                  onClick={toggleSound}
-                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                    preferences.soundOn
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                      : 'border-surface-300 dark:border-surface-600 bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
-                  }`}
-                >
-                  {preferences.soundOn ? (
-                    <Volume2 className="w-6 h-6" />
-                  ) : (
-                    <VolumeX className="w-6 h-6" />
-                  )}
-                  <span className="font-medium">
-                    {preferences.soundOn ? 'Sound On' : 'Sound Off'}
-                  </span>
-                </button>
-                <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
-                  Play sounds for interactions like copying and favoriting
-                </p>
-              </div>
-
-              {/* Motion Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
-                  Motion Effects
-                </label>
-                <button
-                  onClick={toggleMotion}
-                  className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center justify-center space-x-3 ${
-                    !preferences.reducedMotion
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
-                      : 'border-surface-300 dark:border-surface-600 bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-400'
-                  }`}
-                >
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-current rounded-full animate-pulse" />
-                  </div>
-                  <span className="font-medium">
-                    {!preferences.reducedMotion ? 'Motion On' : 'Motion Off'}
-                  </span>
-                </button>
-                <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
-                  {preferences.reducedMotion 
-                    ? 'Respects system preference for reduced motion'
-                    : 'Shows animations and transitions'
-                  }
+                <p className="text-xs text-surface-500 dark:text-surface-400 mt-1">
+                  Current: {preferences.defaultSpecificity}/5
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Privacy Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bubble-card p-6"
-          >
-            <div className="flex items-center space-x-3 mb-6">
-              <Shield className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-xl font-semibold">Privacy</h2>
+          {/* Preferences Section */}
+          <div className="bubble-card p-4 sm:p-6">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900 rounded-lg">
+                <Sliders className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-100">
+                Preferences
+              </h2>
             </div>
-
+            
             <div className="space-y-4">
-              {/* Name Privacy */}
-              <div className="flex items-center justify-between p-4 bg-surface-50 dark:bg-surface-800 rounded-lg">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-surface-900 dark:text-surface-100">
-                    Don't store names in history
+                  <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Sound Effects
                   </h3>
-                  <p className="text-sm text-surface-600 dark:text-surface-400">
-                    When enabled, names won't be sent to the server or saved locally
+                  <p className="text-xs text-surface-500 dark:text-surface-400">
+                    Play sounds for interactions
                   </p>
                 </div>
                 <button
-                  onClick={() => updatePreferences({ privacyNoName: !preferences.privacyNoName })}
+                  onClick={toggleSound}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
-                    preferences.privacyNoName
-                      ? 'bg-primary-500'
-                      : 'bg-surface-300 dark:bg-surface-600'
+                    preferences.soundOn ? 'bg-primary-500' : 'bg-surface-300 dark:bg-surface-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      preferences.soundOn ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Motion Effects
+                  </h3>
+                  <p className="text-xs text-surface-500 dark:text-surface-400">
+                    Show animations and transitions
+                  </p>
+                </div>
+                <button
+                  onClick={toggleMotion}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+                    preferences.motionOn ? 'bg-primary-500' : 'bg-surface-300 dark:bg-surface-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      preferences.motionOn ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Privacy Section */}
+          <div className="bubble-card p-4 sm:p-6">
+            <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900 rounded-lg">
+                <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h2 className="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-100">
+                Privacy
+              </h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-surface-700 dark:text-surface-300">
+                    Don't Store Names
+                  </h3>
+                  <p className="text-xs text-surface-500 dark:text-surface-400">
+                    Names won't be saved in history
+                  </p>
+                </div>
+                <button
+                  onClick={togglePrivacy}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
+                    preferences.privacyNoName ? 'bg-primary-500' : 'bg-surface-300 dark:bg-surface-600'
                   }`}
                 >
                   <span
@@ -225,60 +180,25 @@ export default function Settings() {
                   />
                 </button>
               </div>
-
-              {/* Privacy Notice */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                <div className="flex items-start space-x-3">
-                  <Shield className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-800 dark:text-blue-200">
-                    <p className="font-medium mb-1">Your privacy matters</p>
-                    <p>
-                      We never share your data with third parties. All compliments are generated 
-                      using your developer token and stored locally on your device.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* About Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bubble-card p-6"
-          >
-            <div className="flex items-center space-x-3 mb-6">
-              <Palette className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-              <h2 className="text-xl font-semibold">About</h2>
-            </div>
-
-            <div className="space-y-4 text-sm text-surface-600 dark:text-surface-400">
-              <div className="flex justify-between">
-                <span>Version</span>
-                <span className="font-medium">1.0.0</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Model</span>
-                <span className="font-medium">GPT-5</span>
-              </div>
-              <div className="flex justify-between">
-                <span>API Endpoint</span>
-                <span className="font-medium">/api/compliment</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Rate Limit</span>
-                <span className="font-medium">20/min per IP</span>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-surface-200 dark:border-surface-600">
-              <p className="text-xs text-surface-500 dark:text-surface-400 text-center">
+          <div className="bubble-card p-4 sm:p-6">
+            <div className="text-center">
+              <div className="text-4xl mb-3">💝</div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-2">
+                About This App
+              </h3>
+              <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">
                 Made with ❤️ for spreading kindness, positivity & poetry
               </p>
+              <div className="text-xs text-surface-500 dark:text-surface-400 space-y-1">
+                <p>Version 1.0.0</p>
+                <p>Built with React & AI</p>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </motion.div>
     </div>

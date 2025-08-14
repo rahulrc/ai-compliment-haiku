@@ -156,153 +156,204 @@ export default function Favorites() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-6"
+        transition={{ duration: 0.5 }}
+        className="space-y-6 sm:space-y-8"
       >
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-display font-bold mb-2">
-            Your Favorite Compliments
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-surface-900 dark:text-surface-100 mb-2">
+            Your Favorites
           </h1>
-          <p className="text-surface-600 dark:text-surface-400">
-            {favorites.length} compliment{favorites.length !== 1 ? 's' : ''} saved
+          <p className="text-surface-600 dark:text-surface-400 text-sm sm:text-base">
+            All the compliments and haikus you've loved
           </p>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-2">
-          {styles.map((style) => (
+        <div className="bubble-card p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedStyle('all')}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                  selectedStyle === 'all'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600'
+                }`}
+              >
+                All
+              </button>
+              {['classic', 'goofy', 'poetic', 'professional'].map((style) => (
+                <button
+                  key={style}
+                  onClick={() => setSelectedStyle(style)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                    selectedStyle === style
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600'
+                  }`}
+                >
+                  {style.charAt(0).toUpperCase() + style.slice(1)}
+                </button>
+              ))}
+            </div>
+            
             <button
-              key={style}
-              onClick={() => setSelectedStyle(style)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                selectedStyle === style
-                  ? 'bg-primary-500 text-white'
-                  : 'bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600'
-              }`}
+              onClick={() => setShowClearConfirm(true)}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
             >
-              {style === 'all' ? 'All Styles' : style.charAt(0).toUpperCase() + style.slice(1)}
+              Clear All
             </button>
-          ))}
+          </div>
         </div>
 
         {/* Favorites Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatePresence>
+        {filteredFavorites.length === 0 ? (
+          <div className="bubble-card p-8 text-center">
+            <div className="text-6xl mb-4">💝</div>
+            <h3 className="text-xl font-semibold text-surface-900 dark:text-surface-100 mb-2">
+              No favorites yet
+            </h3>
+            <p className="text-surface-600 dark:text-surface-400 mb-6">
+              Generate some compliments or haikus and save the ones you love!
+            </p>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="bubble-button"
+            >
+              Start Generating
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {filteredFavorites.map((compliment) => (
               <motion.div
                 key={compliment.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-                className="bubble-card p-6 relative group"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="bubble-card p-4 sm:p-6"
               >
-                {/* Confetti for this specific card */}
-                {showConfetti === compliment.id && (
-                  <Confetti
-                    width={400}
-                    height={300}
-                    recycle={false}
-                    numberOfPieces={30}
-                    gravity={0.3}
-                    style={{ position: 'absolute', top: 0, left: 0 }}
-                  />
-                )}
-
-                {/* Style Badge */}
-                <div className="absolute top-4 right-4">
-                  <span className="chip text-xs">
-                    {compliment.style}
-                  </span>
-                </div>
-
-                {/* Compliment Text */}
+                {/* Content */}
                 <div className="mb-4">
-                  <blockquote className="text-lg font-medium text-surface-900 dark:text-surface-100 leading-relaxed text-balance">
-                    "{compliment.text}"
-                  </blockquote>
+                  {compliment.tags.includes('haiku') ? (
+                    <div className="text-lg sm:text-xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
+                      {compliment.text.split('\n').map((line, index) => (
+                        <div key={index} className="mb-1 last:mb-0">
+                          {line}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <blockquote className="text-lg sm:text-xl font-medium text-surface-900 dark:text-surface-100 leading-relaxed">
+                      "{compliment.text}"
+                    </blockquote>
+                  )}
                 </div>
 
-                {/* Tags */}
-                {compliment.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {compliment.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="chip text-xs px-2 py-1"
-                      >
-                        {tag}
-                      </span>
+                {/* Tags and Sparkle */}
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {compliment.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 text-xs rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  <div className="flex items-center space-x-1 ml-auto">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-3 h-3 rounded-full ${
+                          i < compliment.sparkleScore 
+                            ? 'bg-yellow-400' 
+                            : 'bg-surface-200 dark:bg-surface-600'
+                        }`}
+                      />
                     ))}
-                    {compliment.tags.length > 3 && (
-                      <span className="text-xs text-surface-500 dark:text-surface-400">
-                        +{compliment.tags.length - 3} more
-                      </span>
-                    )}
                   </div>
-                )}
+                </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleFavoriteClick(compliment)}
-                      className="p-2 text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-colors duration-200"
-                      aria-label="Remove from favorites"
-                    >
-                      <Star className="w-5 h-5 fill-current" />
-                    </button>
-                    <button
-                      onClick={() => handleCopy(compliment)}
-                      className="p-2 text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors duration-200"
-                      aria-label="Copy compliment"
-                    >
-                      <Copy className="w-5 h-5" />
-                    </button>
-                  </div>
-
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    onClick={() => handleCopy(compliment)}
+                    className="flex-1 sm:flex-none flex items-center justify-center space-x-2 px-3 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    <span>📋</span>
+                    <span>Copy</span>
+                  </button>
+                  
                   <button
                     onClick={() => handleRemove(compliment)}
-                    className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    aria-label="Remove from favorites"
+                    className="flex-1 sm:flex-none flex items-center justify-center space-x-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors duration-200"
                   >
-                    <X className="w-5 h-5" />
+                    <span>🗑️</span>
+                    <span>Remove</span>
                   </button>
-                </div>
-
-                {/* Date */}
-                <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-600">
-                  <p className="text-xs text-surface-500 dark:text-surface-400">
-                    Saved {new Date(compliment.timestamp).toLocaleDateString()}
-                  </p>
                 </div>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        )}
+      </motion.div>
 
-        {/* Empty Filter State */}
-        {filteredFavorites.length === 0 && favorites.length > 0 && (
+      {/* Clear Confirmation Modal */}
+      <AnimatePresence>
+        {showClearConfirm && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-12"
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
           >
-            <Filter className="w-16 h-16 mx-auto mb-4 text-surface-300 dark:text-surface-600" />
-            <p className="text-lg font-medium text-surface-600 dark:text-surface-400 mb-2">
-              No {selectedStyle === 'all' ? '' : selectedStyle} favorites
-            </p>
-            <p className="text-surface-500 dark:text-surface-400">
-              Try adjusting your filter or add some {selectedStyle === 'all' ? '' : selectedStyle} compliments
-            </p>
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bubble-card p-6 max-w-sm w-full"
+            >
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-4">
+                Clear All Favorites?
+              </h3>
+              <p className="text-surface-600 dark:text-surface-400 mb-6">
+                This will permanently remove all your saved favorites. This action cannot be undone.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={handleClearAll}
+                  className="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors duration-200"
+                >
+                  Yes, Clear All
+                </button>
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="flex-1 px-4 py-2 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
+
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          onConfettiComplete={() => setShowConfetti(null)}
+        />
+      )}
     </div>
   )
 }
