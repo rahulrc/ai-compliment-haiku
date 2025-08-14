@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing Your Secure API</h1>
+    <button onclick="testAPI()">Test API Endpoint</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                console.log('Testing API endpoint...');
+                
+                const testData = {
+                    relationship: 'friend',
+                    context: ['helpful', 'creative'],
+                    style: 'classic',
+                    specificity: 3,
+                    type: 'compliment'
+                };
+                
+                console.log('Sending data:', testData);
+                
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData),
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Success response:', data);
+                    resultDiv.innerHTML = `
+                        <h3>✅ API Working!</h3>
+                        <p><strong>Response:</strong></p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.log('Error response:', errorData);
+                    resultDiv.innerHTML = `
+                        <h3>❌ API Error</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Error:</strong> ${errorData.error || 'Unknown error'}</p>
+                        <p><strong>Details:</strong> ${errorData.details || 'No details provided'}</p>
+                        <p><strong>Full Response:</strong></p>
+                        <pre>${JSON.stringify(errorData, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Stack:</strong></p>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
