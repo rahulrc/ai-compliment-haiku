@@ -4,7 +4,7 @@ import { usePreferences } from '../contexts/PreferencesContext'
 import { useCompliments } from '../contexts/ComplimentsContext'
 import { Compliment } from '../contexts/ComplimentsContext'
 import toast from 'react-hot-toast'
-import { Sparkles, RefreshCw } from 'lucide-react'
+import { Sparkles, RefreshCw, Heart, Star, Zap } from 'lucide-react'
 import ContextChips from '../components/ContextChips'
 import StyleSelector from '../components/StyleSelector'
 import SpecificitySlider from '../components/SpecificitySlider'
@@ -46,6 +46,45 @@ export default function Generator() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [result, setResult] = useState<Compliment | null>(null)
   const [error, setError] = useState<string>('')
+
+  // Sound effects using Web Audio API
+  const playSuccess = useCallback(() => {
+    if (!preferences.soundOn) return
+    
+    try {
+      // Create audio context if it doesn't exist
+      let audioContext = (window as any).audioContext
+      
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        ;(window as any).audioContext = audioContext
+      }
+      
+      // Resume context if suspended (required by modern browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+      
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      // Success sound: ascending notes
+      oscillator.frequency.setValueAtTime(400, audioContext.currentTime)
+      oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2)
+      oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.4)
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.4)
+    } catch (error) {
+      console.warn('Sound playback failed:', error)
+    }
+  }, [preferences.soundOn])
 
   const handleInputChange = (field: keyof GeneratorInputs, value: any) => {
     setInputs(prev => ({ ...prev, [field]: value }))
@@ -115,6 +154,9 @@ export default function Generator() {
       setResult(compliment)
       addToHistory(compliment)
       setStatus('idle')
+      
+      // Play success sound
+      playSuccess()
 
       // Telemetry
       console.log('compliment_generated', {
@@ -133,7 +175,7 @@ export default function Generator() {
       // Telemetry
       console.log('compliment_error', { reason: err instanceof Error ? err.message : 'unknown' })
     }
-  }, [inputs, preferences.privacyNoName, addToHistory])
+  }, [inputs, preferences.privacyNoName, addToHistory, playSuccess])
 
   const generateHaiku = useCallback(async () => {
     if (inputs.context.length === 0) {
@@ -176,6 +218,9 @@ export default function Generator() {
       setResult(haiku)
       addToHistory(haiku)
       setStatus('idle')
+      
+      // Play success sound
+      playSuccess()
 
       // Telemetry
       console.log('haiku_generated', {
@@ -194,7 +239,7 @@ export default function Generator() {
       // Telemetry
       console.log('haiku_error', { reason: err instanceof Error ? err.message : 'unknown' })
     }
-  }, [inputs, preferences.privacyNoName, addToHistory])
+  }, [inputs, preferences.privacyNoName, addToHistory, playSuccess])
 
   const handleGenerate = (type: 'compliment' | 'haiku') => {
     // Set the generation type
@@ -230,19 +275,38 @@ export default function Generator() {
         className="space-y-6"
       >
         {/* Hero Card */}
-        <div className="bubble-card p-6">
-          <h2 className="text-2xl font-display font-semibold text-center mb-4">
+        <div className="bubble-card p-6 relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="floating-orb w-20 h-20 bg-gradient-to-br from-pink-200 to-purple-200 -translate-x-10 -translate-y-10"></div>
+          <div className="floating-orb w-16 h-16 bg-gradient-to-br from-blue-200 to-cyan-200 top-4 right-4"></div>
+          <div className="floating-orb w-12 h-12 bg-gradient-to-br from-yellow-200 to-orange-200 bottom-4 left-4"></div>
+          
+          {/* Floating icons */}
+          <motion.div
+            animate={{ y: [-5, 5, -5] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-6 right-8 text-2xl animate-sparkle"
+          >
+            ✨
+          </motion.div>
+          <motion.div
+            animate={{ y: [5, -5, 5] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-6 left-8 text-2xl animate-sparkle"
+          >
+            🌟
+          </motion.div>
+          
+          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-6 gradient-text">
             Poetry and Praise, On Demand
           </h2>
-          <p className="text-center text-surface-600 dark:text-surface-400 mb-6 text-sm">
-            Generate a compliment or haiku based on your inputs
-          </p>
 
           <div className="space-y-6">
             {/* Name and Relationship */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2 flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-pink-500" />
                   Name (optional)
                 </label>
                 <input
@@ -250,7 +314,7 @@ export default function Generator() {
                   value={inputs.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
+                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base shadow-sm hover:shadow-md"
                   disabled={preferences.privacyNoName}
                 />
                 {preferences.privacyNoName && (
@@ -261,13 +325,14 @@ export default function Generator() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
                   Relationship
                 </label>
                 <select
                   value={inputs.relationship}
                   onChange={(e) => handleInputChange('relationship', e.target.value)}
-                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
+                  className="w-full px-4 py-2 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base shadow-sm hover:shadow-md"
                 >
                   {relationships.map((rel) => (
                     <option key={rel} value={rel}>
@@ -280,7 +345,8 @@ export default function Generator() {
 
             {/* Context Input */}
             <div>
-              <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+              <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-orange-500" />
                 Context (add up to 8)
               </label>
               <ContextChips
@@ -297,7 +363,8 @@ export default function Generator() {
             {/* Style and Specificity */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-500" />
                   Style
                 </label>
                 <StyleSelector
@@ -307,68 +374,47 @@ export default function Generator() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-3 flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-blue-500" />
                   Specificity
                 </label>
                 <SpecificitySlider
                   value={inputs.specificity}
-                  onChange={(specificity) => handleInputChange('specificity', specificity)}
+                  onChange={(value) => handleInputChange('specificity', value)}
                 />
-                <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
-                  How much of your context to weave in. Higher = more specific.
-                </p>
               </div>
             </div>
 
             {/* Generate Buttons */}
-            <div className="text-center space-y-4">
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleGenerate('compliment')}
-                  disabled={status === 'loading' || inputs.context.length === 0}
-                  onKeyPress={handleKeyPress}
-                  className="w-full px-6 py-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-300 dark:disabled:bg-surface-600 text-white font-medium rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === 'loading' && inputs.generationType === 'compliment' ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                      <span>Generating...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <Sparkles className="w-5 h-5" />
-                      <span>Generate Compliment</span>
-                    </div>
-                  )}
-                </button>
-
-                <button
-                  onClick={() => handleGenerate('haiku')}
-                  disabled={status === 'loading' || inputs.context.length === 0}
-                  className="w-full px-6 py-4 bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 dark:disabled:bg-purple-600 text-white font-medium rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === 'loading' && inputs.generationType === 'haiku' ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <RefreshCw className="w-5 h-5 animate-spin" />
-                      <span>Generating...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <span className="text-2xl">🌸</span>
-                      <span>Generate Haiku</span>
-                    </div>
-                  )}
-                </button>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <motion.button
+                onClick={() => handleGenerate('compliment')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bubble-button glow text-white px-6 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <Heart className="w-5 h-5" />
+                  <span>Generate Compliment</span>
+                </div>
+              </motion.button>
               
-              <p className="text-sm text-surface-500 dark:text-surface-400">
-                Choose whether to generate a compliment or a haiku based on your inputs
-              </p>
+              <motion.button
+                onClick={() => handleGenerate('haiku')}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bubble-button glow text-white px-6 py-3 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <Sparkles className="w-5 h-5" />
+                  <span>Generate Haiku</span>
+                </div>
+              </motion.button>
             </div>
           </div>
         </div>
 
-        {/* Result Area */}
+        {/* Results */}
         <AnimatePresence mode="wait">
           {status === 'loading' && (
             <motion.div
@@ -390,10 +436,7 @@ export default function Generator() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <ErrorCard
-                error={error}
-                onRetry={generateCompliment}
-              />
+              <ErrorCard error={error} onRetry={() => handleGenerate(inputs.generationType || 'compliment')} />
             </motion.div>
           )}
 
@@ -403,30 +446,12 @@ export default function Generator() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
               <ResultCard
                 compliment={result}
-                onGenerateAnother={() => {
-                  setResult(null)
-                  setStatus('idle')
-                }}
+                onGenerateAnother={() => handleGenerate(inputs.generationType || 'compliment')}
               />
-            </motion.div>
-          )}
-
-          {status === 'idle' && !result && (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <div className="text-surface-400 dark:text-surface-500">
-                <Sparkles className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">Ready when you are—tap Generate.</p>
-                <p className="text-sm mt-2">Try adding context like "helped with Q3 deck" or "loves trail runs"</p>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>

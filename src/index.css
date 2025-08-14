@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import fun fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fredoka:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap');
+
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
@@ -11,32 +14,135 @@
     @apply bg-surface-50 dark:bg-surface-900 text-surface-900 dark:text-surface-100;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+  
+  /* Fun font classes */
+  .font-display {
+    font-family: 'Fredoka', 'Inter', system-ui, sans-serif;
+  }
+  
+  .font-accent {
+    font-family: 'Quicksand', 'Inter', system-ui, sans-serif;
+  }
+  
+  .font-fun {
+    font-family: 'Fredoka', 'Inter', system-ui, sans-serif;
+  }
 }
 
 @layer components {
   .bubble-card {
-    @apply bg-white dark:bg-surface-800 rounded-xl shadow-soft border border-surface-200 dark:border-surface-700;
+    @apply bg-white dark:bg-surface-800 rounded-xl shadow-soft border border-surface-200 dark:border-surface-700 relative overflow-hidden;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.95) 100%);
+  }
+  
+  .bubble-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ec4899, #8b5cf6, #06b6d4, #f59e0b);
+    border-radius: 8px 8px 0 0;
   }
   
   .bubble-button {
     @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95;
+    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  }
+  
+  .bubble-button:hover {
+    background: linear-gradient(135deg, #db2777 0%, #7c3aed 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
   }
   
   .bubble-input {
     @apply bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .bubble-input:focus {
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
   }
   
   .chip {
     @apply bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium;
+    background: linear-gradient(135deg, #fce7f3 0%, #ede9fe 100%);
+    border: 1px solid rgba(236, 72, 153, 0.2);
   }
   
   .sparkle {
     @apply text-yellow-400 dark:text-yellow-300;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  
+  /* Decorative elements */
+  .floating-orb {
+    @apply absolute rounded-full opacity-20 blur-sm;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .floating-orb:nth-child(1) {
+    animation-delay: 0s;
+  }
+  
+  .floating-orb:nth-child(2) {
+    animation-delay: 2s;
+  }
+  
+  .floating-orb:nth-child(3) {
+    animation-delay: 4s;
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #ec4899, #8b5cf6, #06b6d4, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Glow effects */
+  .glow {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  
+  .glow:hover {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Custom animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+      transform: translateY(-10px) rotate(120deg);
+    }
+    66% {
+      transform: translateY(10px) rotate(240deg);
+    }
+  }
+  
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.1);
+    }
+  }
+  
+  .animate-sparkle {
+    animation: sparkle 2s ease-in-out infinite;
   }
 }
