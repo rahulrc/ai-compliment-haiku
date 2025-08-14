@@ -1,16 +1,17 @@
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import { PreferencesProvider } from './contexts/PreferencesContext'
+import { ComplimentsProvider } from './contexts/ComplimentsContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Generator from './pages/Generator'
 import Favorites from './pages/Favorites'
 import History from './pages/History'
 import Settings from './pages/Settings'
-import { PreferencesProvider } from './contexts/PreferencesContext'
-import { ComplimentsProvider } from './contexts/ComplimentsContext'
 
-function App() {
+// Mobile-optimized app with responsive design
+export default function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
@@ -73,5 +74,3 @@ function App() {
     </PreferencesProvider>
   )
 }
-
-export default App
