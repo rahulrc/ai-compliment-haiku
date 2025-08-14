@@ -28,7 +28,7 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-display font-semibold text-surface-900 dark:text-surface-100">
-                Compliment & Haiku Generator
+                Haikudos
               </h1>
               <p className="text-xs text-surface-500 dark:text-surface-400">
                 AI-powered kindness & poetry
@@ -36,7 +36,7 @@ export default function Header({ theme, onThemeToggle }: HeaderProps) {
             </div>
             <div className="sm:hidden">
               <h1 className="text-sm font-display font-semibold text-surface-900 dark:text-surface-100">
-                Compliment & Haiku
+                Haikudos
               </h1>
             </div>
           </div>

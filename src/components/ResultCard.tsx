@@ -23,13 +23,21 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
     if (!preferences.soundOn) return
     
     try {
+      // Create audio context if it doesn't exist
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      
+      // Resume context if suspended (required by modern browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+      
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       
       oscillator.connect(gainNode)
       gainNode.connect(audioContext.destination)
       
+      // Pop sound: descending tone
       oscillator.frequency.setValueAtTime(800, audioContext.currentTime)
       oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.1)
       
@@ -47,7 +55,14 @@ export default function ResultCard({ compliment, onGenerateAnother }: ResultCard
     if (!preferences.soundOn) return
     
     try {
+      // Create audio context if it doesn't exist
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+      
+      // Resume context if suspended (required by modern browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume()
+      }
+      
       const oscillator = audioContext.createOscillator()
       const gainNode = audioContext.createGain()
       

@@ -250,7 +250,7 @@ export default function Generator() {
                   value={inputs.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Enter name..."
-                  className="bubble-input w-full"
+                  className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
                   disabled={preferences.privacyNoName}
                 />
                 {preferences.privacyNoName && (
@@ -267,7 +267,7 @@ export default function Generator() {
                 <select
                   value={inputs.relationship}
                   onChange={(e) => handleInputChange('relationship', e.target.value)}
-                  className="bubble-input w-full"
+                  className="w-full px-4 py-3 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
                 >
                   {relationships.map((rel) => (
                     <option key={rel} value={rel}>
@@ -327,7 +327,7 @@ export default function Generator() {
                   onClick={() => handleGenerate('compliment')}
                   disabled={status === 'loading' || inputs.context.length === 0}
                   onKeyPress={handleKeyPress}
-                  className="bubble-button w-full text-lg px-6 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-6 py-4 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-300 dark:disabled:bg-surface-600 text-white font-medium rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {status === 'loading' && inputs.generationType === 'compliment' ? (
                     <div className="flex items-center justify-center space-x-2">
@@ -345,7 +345,7 @@ export default function Generator() {
                 <button
                   onClick={() => handleGenerate('haiku')}
                   disabled={status === 'loading' || inputs.context.length === 0}
-                  className="bubble-button bg-purple-500 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed w-full text-lg px-6 py-4"
+                  className="w-full px-6 py-4 bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 dark:disabled:bg-purple-600 text-white font-medium rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {status === 'loading' && inputs.generationType === 'haiku' ? (
                     <div className="flex items-center justify-center space-x-2">

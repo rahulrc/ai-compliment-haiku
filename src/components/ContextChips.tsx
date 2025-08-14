@@ -29,13 +29,13 @@ export default function ContextChips({ context, onAdd, onRemove, maxCount }: Con
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Add context hint..."
-          className="bubble-input flex-1 text-sm"
+          className="flex-1 px-4 py-3 bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 text-base"
           disabled={context.length >= maxCount}
         />
         <button
           type="submit"
           disabled={!inputValue.trim() || context.length >= maxCount}
-          className="bubble-button px-6 py-3 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+          className="px-6 py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-surface-300 dark:disabled:bg-surface-600 text-white font-medium rounded-lg shadow-soft transition-all duration-200 hover:shadow-soft-lg active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
         >
           Add
         </button>
