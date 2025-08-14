@@ -28,6 +28,13 @@ export async function generateCompliment(request: ComplimentRequest): Promise<Co
     // Get API key from environment variable
     const apiKey = import.meta.env.VITE_GPT_5_API_KEY
     
+    // Debug logging (remove this after fixing)
+    console.log('API Key check:', {
+      hasApiKey: !!apiKey,
+      apiKeyLength: apiKey ? apiKey.length : 0,
+      envVars: Object.keys(import.meta.env).filter(key => key.includes('GPT'))
+    })
+    
     if (!apiKey) {
       throw new Error('GPT-5 API key not found. Please set VITE_GPT_5_API_KEY in your environment variables.')
     }
