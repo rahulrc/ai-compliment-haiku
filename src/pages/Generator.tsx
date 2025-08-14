@@ -232,7 +232,7 @@ export default function Generator() {
         {/* Hero Card */}
         <div className="bubble-card p-6">
           <h2 className="text-2xl font-display font-semibold text-center mb-4">
-            Who is this for?
+            Poetry and Praise, On Demand
           </h2>
           <p className="text-center text-surface-600 dark:text-surface-400 mb-6 text-sm">
             Generate a compliment or haiku based on your inputs
